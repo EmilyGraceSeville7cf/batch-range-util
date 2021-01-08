@@ -1,13 +1,13 @@
-# range
+# Description
 
 seq alternative for Batch Script. Prints number range.
 
-Syntax:
+# Syntax
 ```bat
 range [options] first..second[..step]
 ```
 
-Options:
+# Options
 - `-h|--help` - writes help and exits
 - `-v|--version` - writes version and exits
 - `-i|--interactive` - fall in interactive mode
@@ -20,7 +20,7 @@ Interactive mode commands:
 - `c|clear` - clears screen
 - `h|help` - writes help
 
-Examples:
+# Examples
 ```bat
 range --help
 ```
