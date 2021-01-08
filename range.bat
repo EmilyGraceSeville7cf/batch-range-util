@@ -111,6 +111,7 @@ exit /b %ec_success%
         set /a "i_color_code=32"
         if not %i_last_errorlevel% == 0 set /a "i_color_code=31"
         set /p "i_command=%esc%[%i_color_code%m%i_last_errorlevel% %prompt%%esc%[0m"
+        set i_command=%i_command:"=%
 
         if "%i_command%" == "" goto interactive_loop
         
