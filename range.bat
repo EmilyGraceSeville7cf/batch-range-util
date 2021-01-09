@@ -251,6 +251,6 @@ exit /b %ec_success%
 :set_esc
     for /f "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1) do rem"') do (
         set "esc=%%b"
-        exit /b 0
+        exit /b %ec_success%
     )
 exit /b %ec_success%
