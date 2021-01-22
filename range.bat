@@ -84,6 +84,15 @@ exit /b %ec_success%
     echo    c^|clear - clears screen
     echo    h^|help - writes help
     echo.
+    echo Error codes:
+    echo    - 0 - Success
+    echo    - 10 - Other options or ranges are not allowed after first range construction.
+    echo    - 20 - Positive step number expected.
+    echo    - 30 - Unexpected char found instead of range operator (..).
+    echo    - 31 - Unexpected end of string found instead of range operator (..).
+    echo    - 40 - Unexpected char found instead of digit or number sign.
+    echo    - 41 - Unexpected end of string found instead of digit or number sign.
+    echo.
     echo Examples:
     echo    - range --help
     echo    - range 0..10

@@ -1,6 +1,6 @@
 # Description
 
-seq alternative for Batch Script. Prints number range.
+Prints number range.
 
 # Syntax
 ```bat
@@ -19,6 +19,15 @@ Interactive mode commands:
 - `q`|`quit` - exits
 - `c`|`clear` - clears screen
 - `h`|`help` - writes help
+
+# Error codes
+- `0` - Success
+- `10` - Other options or ranges are not allowed after first range construction.
+- `20` - Positive step number expected.
+- `30` - Unexpected char found instead of range operator (..).
+- `31` - Unexpected end of string found instead of range operator (..).
+- `40` - Unexpected char found instead of digit or number sign.
+- `41` - Unexpected end of string found instead of digit or number sign.
 
 # Examples
 ```bat
