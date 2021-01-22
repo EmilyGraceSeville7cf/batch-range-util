@@ -8,17 +8,17 @@ range [options] first..second[..step]
 ```
 
 # Options
-- `-h|--help` - writes help and exits
-- `-v|--version` - writes version and exits
-- `-i|--interactive` - fall in interactive mode
+- `-h`|`--help` - writes help and exits
+- `-v`|`--version` - writes version and exits
+- `-i`|`--interactive` - fall in interactive mode
 
 If range is specified before some option then it is ignored.
 If more than one range is specified only first one is written.
 
 Interactive mode commands:
-- `q|quit` - exits
-- `c|clear` - clears screen
-- `h|help` - writes help
+- `q`|`quit` - exits
+- `c`|`clear` - clears screen
+- `h`|`help` - writes help
 
 # Examples
 ```bat
