@@ -105,23 +105,36 @@ exit /b %ec_success%
 exit /b %ec_success%
 
 :interactive
-    set /a "i_last_errorlevel=0"
+    set "i_em_no_previous_command=No previous command available to perform history expansion."
 
-    :interactive_loop
+    set /a "i_last_errorlevel=0"
+    set "i_previous_command="
+
+    :i_interactive_loop
         set /a "i_color_code=32"
         if not %i_last_errorlevel% == 0 set /a "i_color_code=31"
         set "i_command="
         set /p "i_command=%esc%[%i_color_code%m%i_last_errorlevel% %prompt%%esc%[0m"
 
-        set i_command=%i_command:"=%
+        if not defined i_command goto i_interactive_loop
 
-        if not defined i_command goto interactive_loop
-        if "%i_command: =%" == "" goto interactive_loop
+        set i_command=%i_command:"=%
+        if not defined i_command goto i_interactive_loop
+        if "%i_command: =%" == "" goto i_interactive_loop
         
         set "i_comment_regex=^#.*$"
-        echo %i_command%| findstr /R "%i_comment_regex%" 2> nul > nul && goto interactive_loop
+        echo %i_command%| findstr /R "%i_comment_regex%" 2> nul > nul && goto i_interactive_loop
 
-        call set "i_command=%%i_command:!!=%i_previous_command%%%"
+        set "i_after_remove_exclamation_marks=%i_command:!!=%"
+
+        if defined i_previous_command (
+            call set "i_command=%%i_command:!!=%i_previous_command%%%"
+        ) else (
+            if not "%i_command%" == "%i_after_remove_exclamation_marks%" (
+                echo %i_em_no_previous_command%
+                goto i_interactive_loop
+            )
+        )
 
         set /a "i_is_quit=%false%"
         if "%i_command%" == "q" set /a "i_is_quit=%true%"
@@ -135,7 +148,7 @@ exit /b %ec_success%
 
         if "%i_is_clear%" == "%true%" (
             cls
-            goto interactive_loop
+            goto i_interactive_loop
         )
 
         set /a "i_is_help=%false%"
@@ -144,14 +157,14 @@ exit /b %ec_success%
 
         if "%i_is_help%" == "%true%" (
             call :help
-            goto interactive_loop
+            goto i_interactive_loop
         )
 
         set "i_previous_command=%i_command%"
         call :try_expand_range i_command "%i_command%"
         set /a "i_last_errorlevel=%errorlevel%"
         if %i_last_errorlevel% equ 0 echo %i_command%
-        goto interactive_loop
+        goto i_interactive_loop
 exit /b %ec_success%
 
 :try_expand_range
