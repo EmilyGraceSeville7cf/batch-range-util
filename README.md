@@ -14,7 +14,7 @@ range [options] first..second[..step]
 - `-h`|`--help` - writes help and exits
 - `-v`|`--version` - writes version and exits
 - `-i`|`--interactive` - fall in interactive mode
-- 
+
 ### Interactive
 
 Interactive mode commands:
