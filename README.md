@@ -1,8 +1,8 @@
-# Range
+# Range generator
 
 ## Description
 
-Prints number range.
+Tool to generate ranges and print them into stdout.
 
 ## Syntax
 ```bat
