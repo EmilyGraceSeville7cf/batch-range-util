@@ -2,6 +2,8 @@
 
 ## Description
 
+> ⚠️ This project is no longer maintained.
+
 Tool to generate ranges and print them into stdout.
 
 ## Syntax
