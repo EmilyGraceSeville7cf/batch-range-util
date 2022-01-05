@@ -2,52 +2,61 @@
 
 ## Description
 
-> ⚠️ This project is no longer maintained.
-
 Tool to generate ranges and print them into stdout.
 
 ## Syntax
+
 ```bat
-range [options] first..second[..step]
+range [{ -h | --help }] [{ -v | --version }] { -i | --interactive }
+range <from>..<to>[..<step>]
 ```
 
-## Options
-
-- `-h`|`--help` - writes help and exits
-- `-v`|`--version` - writes version and exits
-- `-i`|`--interactive` - fall in interactive mode
-
-### Interactive
-
-Interactive mode commands:
-- `q`|`quit` - exits
-- `c`|`clear` - clears screen
-- `h`|`help` - writes help
+| Short option |   Long option   | Description                  |
+| :----------: | :-------------: | :--------------------------- |
+|     `-h`     |    `--help`     | Print help                   |
+|     `-v`     |   `--version`   | Print version                |
+|     `-i`     | `--interactive` | Start an interactive session |
 
 ## Return codes
-- `0` - Success
-- `10` - Other options or ranges are not allowed after first range construction.
-- `20` - Positive step number expected.
-- `30` - Unexpected char found instead of range operator (..).
-- `31` - Unexpected end of string found instead of range operator (..).
-- `40` - Unexpected char found instead of digit or number sign.
-- `41` - Unexpected end of string found instead of digit or number sign.
 
-## Notes
-
-If range is specified before some option then it is ignored.
-If more than one range is specified only first one is written.
+| Return code | Description                                                            |
+| :---------: | :--------------------------------------------------------------------- |
+|     `0`     | Success                                                                |
+|    `10`     | Other options or ranges are not allowed after first range construction |
+|    `20`     | Positive step number expected                                          |
+|    `30`     | Unexpected char found instead of range operator (..)                   |
+|    `31`     | Unexpected end of string found instead of range operator (..)          |
+|    `40`     | Unexpected char found instead of digit or number sign                  |
+|    `41`     | Unexpected end of string found instead of digit or number sign         |
 
 ## Examples
-```bat
+
+Prints help:
+
+```batch
 range --help
 ```
-```bat
-range 0..10
+
+Generates 1 2 3 4 5 6 7 8 9 10 sequence:
+
+```batch
+range 1..10
 ```
-```bat
-range 0..10..2
+
+Generates 1 3 5 7 9 sequence:
+
+```batch
+range 1..10..2
 ```
-```bat
-range 0..10 --help
+
+Generates 10 9 8 7 6 5 4 3 2 1 sequence:
+
+```batch
+range 10..1
+```
+
+Generates 10 8 6 4 2 sequence:
+
+```batch
+range 10..1..-2
 ```
