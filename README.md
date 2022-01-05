@@ -29,34 +29,6 @@ range <from>..<to>[..<step>]
 |    `40`     | Unexpected char found instead of digit or number sign                  |
 |    `41`     | Unexpected end of string found instead of digit or number sign         |
 
-## Examples
+## Supported environments and examples
 
-Prints help:
-
-```batch
-range --help
-```
-
-Generates 1 2 3 4 5 6 7 8 9 10 sequence:
-
-```batch
-range 1..10
-```
-
-Generates 1 3 5 7 9 sequence:
-
-```batch
-range 1..10..2
-```
-
-Generates 10 9 8 7 6 5 4 3 2 1 sequence:
-
-```batch
-range 10..1
-```
-
-Generates 10 8 6 4 2 sequence:
-
-```batch
-range 10..1..-2
-```
+This info is available only [here](https://console-utils.github.io/).
