@@ -59,8 +59,6 @@ call :init
 
     set "delimiter= "
     set "prompt=>>> "
-
-    set "sn_right_range_syntax=low..high[..step]."
 exit /b %ec_success%
 
 :help
