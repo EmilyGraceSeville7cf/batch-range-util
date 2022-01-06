@@ -50,71 +50,59 @@ call :init
 :init
     set /a "ec_success=0"
 
-    set /a "ec_too_many_arguments=10"
+    set /a "ec_too_many_arguments=2"
 
-    set "em_too_many_arguments=Other options or ranges are not allowed after first range construction."
+    set "em_too_many_arguments=Other options or ranges are not allowed after first range construction"
 
     set /a "true=0"
     set /a "false=1"
 
     set "delimiter= "
     set "prompt=>>> "
-
-    set "sn_right_range_syntax=low..high[..step]."
-
-    call :set_esc
 exit /b %ec_success%
 
 :help
-    echo Prints number range.
+    echo Tool to generate ranges and print them into stdout.
     echo.
-    echo Syntax:
-    echo    range [options] first..second[..step]
+    echo [ Non-interactive mode ]
+    echo    range [{ -h ^| --help }] [{ -v ^| --version }] { -i ^| --interactive}
+	echo    range ^<from^>..^<to^>..[^<step^>]
     echo.
-    echo Options:
-    echo    -h^|--help - writes help and exits
-    echo    -v^|--version - writes version and exits
-    echo    -i^|--interactive - fall in interactive mode
+    echo    * -h^|--help - print help
+    echo    * -v^|--version - print version
+    echo    * -i^|--interactive - start an interactive session
+	echo.
+    echo    * 0 - Success
+    echo    * 2 - Other options or ranges are not allowed after first range construction
+    echo    * 2 - Positive step number expected
+    echo    * 2 - Unexpected char found instead of range operator (..)
+    echo    * 2 - Unexpected end of string found instead of range operator (..)
+    echo    * 2 - Unexpected char found instead of digit or number sign
+    echo    * 2 - Unexpected end of string found instead of digit or number sign
     echo.
-    echo If range is specified before some option then it is ignored.
-    echo If more than one range is specified only first one is written.
-    echo.
-    echo Interactive mode commands:
-    echo    q^|quit - exits
+    echo [ Interactive mode ]
+	echo    h^|help - print help
+	echo    v^|version - print version
+    echo    q^|quit - exit
     echo    c^|clear - clears screen
-    echo    h^|help - writes help
-    echo.
-    echo Error codes:
-    echo    - 0 - Success
-    echo    - 10 - Other options or ranges are not allowed after first range construction.
-    echo    - 20 - Positive step number expected.
-    echo    - 30 - Unexpected char found instead of range operator (..).
-    echo    - 31 - Unexpected end of string found instead of range operator (..).
-    echo    - 40 - Unexpected char found instead of digit or number sign.
-    echo    - 41 - Unexpected end of string found instead of digit or number sign.
-    echo.
-    echo Examples:
-    echo    - range --help
-    echo    - range 0..10
-    echo    - range 0..10..2
-    echo    - range 0..10 --help (--help option is ignored)
+	echo    !! - print help
+	echo.
+	echo    ^> Interactive mode prompt is: ^<return_code^>^>^>^>.
 exit /b %ec_success%
 
 :version
-    echo 1.1 ^(c^) 2021 year
+    echo 1.2 ^(c^) 2022 year
 exit /b %ec_success%
 
 :interactive
-    set "i_em_no_previous_command=No previous command available to perform history expansion."
+    set "i_em_no_previous_command=No previous command available to perform history expansion"
 
     set /a "i_last_errorlevel=0"
     set "i_previous_command="
 
     :i_interactive_loop
-        set /a "i_color_code=32"
-        if not %i_last_errorlevel% == 0 set /a "i_color_code=31"
         set "i_command="
-        set /p "i_command=%esc%[%i_color_code%m%i_last_errorlevel% %prompt%%esc%[0m"
+        set /p "i_command=%i_last_errorlevel% %prompt%"
 
         if not defined i_command goto i_interactive_loop
 
@@ -123,7 +111,8 @@ exit /b %ec_success%
         if "%i_command: =%" == "" goto i_interactive_loop
         
         set "i_comment_regex=^#.*$"
-        echo %i_command%| findstr /R "%i_comment_regex%" 2> nul > nul && goto i_interactive_loop
+        echo %i_command%| grep %i_comment_regex% 2> nul > nul
+		if %errorlevel% equ 0 goto i_interactive_loop
 
         set "i_after_remove_exclamation_marks=%i_command:!!=%"
 
@@ -168,9 +157,9 @@ exit /b %ec_success%
 exit /b %ec_success%
 
 :try_expand_range
-    set /a "ter_ec_positive_step_number_expected=20"
+    set /a "ter_ec_positive_step_number_expected=2"
 
-    set "ter_em_positive_step_number_expected=Positive step number expected."
+    set "ter_em_positive_step_number_expected=Positive step number expected"
 
     set "ter_variable_name=%~1"
     set "ter_range_expression=%~2"
@@ -271,11 +260,11 @@ exit /b %ec_success%
 exit /b %ec_success%
 
 :skip_range_operator
-    set /a "sro_ec_unexpected_char=30"
-    set /a "sro_ec_unexpected_end_of_string=31"
+    set /a "sro_ec_unexpected_char=2"
+    set /a "sro_ec_unexpected_end_of_string=2"
 
-    set "sro_em_unexpected_char=Unexpected char found instead of range operator (..)."
-    set "sro_em_unexpected_end_of_string=Unexpected end of string found instead of range operator (..)."
+    set "sro_em_unexpected_char=Unexpected char found instead of range operator (..)"
+    set "sro_em_unexpected_end_of_string=Unexpected end of string found instead of range operator (..)"
 
     set "sro_index_variable_name=%~1"
     set "sro_string=%~2"
@@ -312,11 +301,11 @@ exit /b %ec_success%
 exit /b %ec_success%
 
 :skip_number
-    set /a "sn_ec_unexpected_char=40"
-    set /a "sn_ec_unexpected_end_of_string=41"
+    set /a "sn_ec_unexpected_char=2"
+    set /a "sn_ec_unexpected_end_of_string=2"
 
-    set "sn_em_unexpected_char=Unexpected char found instead of digit or number sign."
-    set "sn_em_unexpected_end_of_string=Unexpected end of string found instead of digit or number sign."
+    set "sn_em_unexpected_char=Unexpected char found instead of digit or number sign"
+    set "sn_em_unexpected_end_of_string=Unexpected end of string found instead of digit or number sign"
 
     set "sn_index_variable_name=%~1"
     set "sn_result_number_variable_name=%~2"
@@ -333,18 +322,19 @@ exit /b %ec_success%
     :sn_skip_number_digits_loop
         call set "sn_char=%%sn_string:~%sn_i%,1%%"
         set "sn_digit_regex=[0-9]"
-        if defined sn_char (
-            echo %sn_char%| findstr /r "%sn_digit_regex%" 2> nul > nul && (
-                set /a "sn_i+=1"
-                set /a "sn_result_number_digit_count+=1"
-                set "sn_result_number=%sn_result_number%%sn_char%"
-                goto sn_skip_number_digits_loop
-            ) || (
+        if not "%sn_char%" == ""  (
+            echo %sn_char%| grep %sn_digit_regex% 2> nul > nul
+			if errorlevel 1 (
                 if %sn_result_number_digit_count% equ 0 (
                     set "%sn_index_variable_name%=%sn_i%"
                     echo %sn_em_unexpected_char%
                     exit /b %sn_ec_unexpected_char%
                 )
+            ) else (
+                set /a "sn_i+=1"
+                set /a "sn_result_number_digit_count+=1"
+                set "sn_result_number=%sn_result_number%%sn_char%"
+                goto sn_skip_number_digits_loop
             )
         ) else (
             if %sn_result_number_digit_count% equ 0 (
@@ -397,11 +387,4 @@ exit /b %ec_success%
 
     echo %ue_string%
     echo %ue_placeholder%^^
-exit /b %ec_success%
-
-:set_esc
-    for /f "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1) do rem"') do (
-        set "esc=%%b"
-        exit /b 0
-    )
 exit /b %ec_success%
