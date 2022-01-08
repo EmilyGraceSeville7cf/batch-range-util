@@ -59,6 +59,26 @@ call :init
 
     set "delimiter= "
     set "prompt=>>> "
+
+    call :check_dependencies
+exit /b %ec_success%
+
+:check_dependencies
+    set /a "ec_missing_dependency=2"
+
+    set "em_missing_dependency=Can't run command properly due to missing dependency"
+
+    grep --version 2> nul > nul
+    if errorlevel 1 (
+        echo %em_missing_dependency%: grep >&2
+        exit /b %ec_missing_dependency%
+    )
+
+    sed --version 2> nul > nul
+    if errorlevel 1 (
+        echo %em_missing_dependency%: sed >&2
+        exit /b %ec_missing_dependency%
+    )
 exit /b %ec_success%
 
 :help
@@ -73,6 +93,7 @@ exit /b %ec_success%
     echo    * -i^|--interactive - start an interactive session
 	echo.
     echo    * 0 - Success
+    echo    * 2 - Can't run command properly due to missing dependency
     echo    * 2 - Other options or ranges are not allowed after first range construction
     echo    * 2 - Positive step number expected
     echo    * 2 - Unexpected char found instead of range operator (..)
