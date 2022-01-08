@@ -9,7 +9,7 @@ Tool to generate ranges and print them into stdout.
 ## Syntax
 
 ```bat
-range [{ -h | --help }] [{ -v | --version }] { -i | --interactive }
+range { -h | --help } { -v | --version } { -i | --interactive }
 range <from>..<to>[..<step>]
 ```
 
@@ -21,15 +21,15 @@ range <from>..<to>[..<step>]
 
 ## Return codes
 
-| Return code | Description                                                            |
-| :---------: | :--------------------------------------------------------------------- |
-|     `0`     | Success                                                                |
-|    `10`     | Other options or ranges are not allowed after first range construction |
-|    `20`     | Positive step number expected                                          |
-|    `30`     | Unexpected char found instead of range operator (..)                   |
-|    `31`     | Unexpected end of string found instead of range operator (..)          |
-|    `40`     | Unexpected char found instead of digit or number sign                  |
-|    `41`     | Unexpected end of string found instead of digit or number sign         |
+| Return code | Description                              |
+| :---------: | :--------------------------------------- |
+|     `0`     | Success                                  |
+|     `2`     | Unsupported option used                  |
+|     `2`     | Trailing argument after first range used |
+|     `2`     | No previous command found                |
+|     `2`     | Negative step used                       |
+|     `2`     | Wrong char used                          |
+|     `2`     | Not enough characters used               |
 
 ## Supported environments and examples
 
