@@ -13,6 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: true
     - name: check
       run: |
         bash $CI_HELPERS_PREFIX/scripts/github_flow/check_mergeability.sh
@@ -22,6 +24,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: true
     - name: lint
       run: |
         npm install --global markdownlint-cli
