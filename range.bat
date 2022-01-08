@@ -88,6 +88,7 @@ exit /b %ec_success%
     echo.
     echo [ Interactive mode ]
 	echo    * h^|help - print help
+    echo    * v^|version - print version
     echo    * q^|quit - exit
     echo    * c^|clear - clears screen
 	echo    * !! - print help
@@ -96,7 +97,7 @@ exit /b %ec_success%
 exit /b %ec_success%
 
 :version
-    echo 1.2 ^(c^) 2022 year
+    echo 2.0 ^(c^) 2022 year
 exit /b %ec_success%
 
 :interactive
@@ -140,6 +141,12 @@ exit /b %ec_success%
         call :is_option "%i_command%" h help
         if not errorlevel 1 (
             call :help
+            goto i_interactive_loop
+        )
+
+        call :is_option "%i_command%" v version
+        if not errorlevel 1 (
+            call :version
             goto i_interactive_loop
         )
 
