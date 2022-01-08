@@ -66,17 +66,23 @@ exit /b %ec_success%
 :check_dependencies
     set /a "ec_missing_dependency=2"
 
-    set "em_missing_dependency=Can't run command properly due to missing dependency"
+    set "em_missing_dependency=Can't run command properly due to missing dependency, please install it via a given url and rerun this command again"
 
     grep --version 2> nul > nul
     if errorlevel 1 (
-        echo %em_missing_dependency%: grep >&2
+        echo %em_missing_dependency%: grep (http://gnuwin32.sourceforge.net/packages/grep.htm) >&2
         exit /b %ec_missing_dependency%
     )
 
     sed --version 2> nul > nul
     if errorlevel 1 (
-        echo %em_missing_dependency%: sed >&2
+        echo %em_missing_dependency%: sed (http://gnuwin32.sourceforge.net/packages/sed.htm) >&2
+        exit /b %ec_missing_dependency%
+    )
+
+    expr --version 2> nul > nul
+    if errorlevel 1 (
+        echo %em_missing_dependency%: expr (http://gnuwin32.sourceforge.net/packages/coreutils.htm) >&2
         exit /b %ec_missing_dependency%
     )
 exit /b %ec_success%
