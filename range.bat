@@ -68,21 +68,9 @@ exit /b %ec_success%
 
     set "em_missing_dependency=Can't run command properly due to missing dependency, please install it via a given url and rerun this command again"
 
-    grep --version 2> nul > nul
+    gawk --version 2> nul > nul
     if errorlevel 1 (
-        echo %em_missing_dependency%: grep (http://gnuwin32.sourceforge.net/packages/grep.htm) >&2
-        exit /b %ec_missing_dependency%
-    )
-
-    sed --version 2> nul > nul
-    if errorlevel 1 (
-        echo %em_missing_dependency%: sed (http://gnuwin32.sourceforge.net/packages/sed.htm) >&2
-        exit /b %ec_missing_dependency%
-    )
-
-    expr --version 2> nul > nul
-    if errorlevel 1 (
-        echo %em_missing_dependency%: expr (http://gnuwin32.sourceforge.net/packages/coreutils.htm) >&2
+        echo %em_missing_dependency%: gawk (http://gnuwin32.sourceforge.net/packages/gawk.htm) >&2
         exit /b %ec_missing_dependency%
     )
 exit /b %ec_success%
