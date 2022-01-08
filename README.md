@@ -1,5 +1,7 @@
 # Range generator
 
+[![Continuous Integration](https://github.com/Console-Utils/batch-range-util/actions/workflows/ci.yml/badge.svg)](https://github.com/Console-Utils/batch-range-util/actions/workflows/ci.yml)
+
 ## Description
 
 Tool to generate ranges and print them into stdout.

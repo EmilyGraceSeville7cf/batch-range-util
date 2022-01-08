@@ -1,0 +1,4 @@
+[submodule "ci-helpers"]
+	path = ci-helpers
+	url = https://github.com/Console-Utils/ci-helpers.git
+	branch = main
