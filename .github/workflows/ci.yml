@@ -29,4 +29,4 @@ jobs:
     - name: lint
       run: |
         npm install --global markdownlint-cli
-        markdownlint --config $CI_HELPERS_PREFIX/configs/config.yml *.md
+        markdownlint --config $CI_HELPERS_PREFIX/configs/executable.yml *.md
