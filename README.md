@@ -9,22 +9,25 @@ Tool to generate ranges and print them into stdout.
 ## Syntax
 
 ```bat
-range { -h | --help } { -v | --version } { -i | --interactive }
-range <from>..<to>[..<step>]
+range { -h --help } { -v --version } { { -l <number> ^| --limit <number> } , { -i --interactive } }
+range { { -l <number> ^| --limit <number> } , ^<from^>..^<to^>..[^<step^>] }
 ```
 
-| Short option |   Long option   | Description                  |
-| :----------: | :-------------: | :--------------------------- |
-|     `-h`     |    `--help`     | Print help                   |
-|     `-v`     |   `--version`   | Print version                |
-|     `-i`     | `--interactive` | Start an interactive session |
+| Short option |   Long option   | Default | Description                       |
+| :----------: | :-------------: | :-----: | :-------------------------------- |
+|     `-h`     |    `--help`     |    -    | Print help                        |
+|     `-v`     |   `--version`   |    -    | Print version                     |
+|     `-i`     | `--interactive` |    -    | Start an interactive session      |
+|     `-l`     |    `--limit`    |   100   | Specify random number range limit |
 
 ## Return codes
 
 | Return code | Description                              |
 | :---------: | :--------------------------------------- |
 |     `0`     | Success                                  |
+|     `2`     | Missing value for -l^&#124;--limit found |
 |     `2`     | Unsupported option used                  |
+|     `2`     | Missing range                            |
 |     `2`     | Trailing argument after first range used |
 |     `2`     | No previous command found                |
 |     `2`     | Negative step used                       |
