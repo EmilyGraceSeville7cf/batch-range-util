@@ -142,8 +142,8 @@ exit /b %ec_success%
     echo Tool to generate ranges and print them into stdout.
     echo.
     echo !HELP_HEADER_MARKER![!HELP_HEADER_ITEM! Non-interactive mode !HELP_HEADER_MARKER!]!default_color!
-    echo    range { -h --help } { -v --version } { { -l ^<number^> ^| --limit ^<number^> } , { -nw --not-wine } , { -i --interactive } }
-	echo    range { { -l ^<number^> ^| --limit ^<number^> } , ^<from^>..^<to^>..[^<step^>] }
+    echo     range -h^|-help -v^|--version ^( -l^|--limit -i^|--interactive ^)
+    echo     range ^( -l^|--limit ^<from^>..^<to^>..[^<step^>] ^)
     echo.
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -h^|--help - print help!default_color!
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -v^|--version - print version!default_color!
