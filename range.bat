@@ -137,7 +137,7 @@ set /a "i=0"
     if not defined HELP_NOTE_ITEM set "HELP_NOTE_ITEM=%esc%[91m"
 
     if not defined SYNTAX_COMMAND_NAME set "SYNTAX_COMMAND_NAME=%esc%[32m"
-    if not defined SYNTAX_COMMAND_SWITCH_NAME set "SYNTAX_COMMAND_SWITCH_NAME=%esc%[924m"
+    if not defined SYNTAX_COMMAND_SWITCH_NAME set "SYNTAX_COMMAND_SWITCH_NAME=%esc%[92m"
     if not defined SYNTAX_COMMAND_SWITCH_TYPE set "SYNTAX_COMMAND_SWITCH_TYPE=%esc%[93m"
 exit /b %ec_success%
 
