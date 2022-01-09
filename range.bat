@@ -385,8 +385,11 @@ exit /b %ec_success%
     set "io_short_option=%~2"
     set "io_long_option=%~3"
 
-    gawk "BEGIN { exit ""%io_option%"" ~ /^(%io_short_option%|%io_long_option%)$/ }"
-    if not errorlevel 1 exit /b %io_option_is_not_recognized%
+    set /a "io_matches=%false%"
+    if "%io_option%" == "%io_short_option%" set /a "io_matches=%true%"
+    if "%io_option%" == "%io_long_option%" set /a "io_matches=%true%"
+
+    if "%io_matches%" == "%false%" exit /b %io_option_is_not_recognized%
 exit /b %ec_success%
 
 :is_match
