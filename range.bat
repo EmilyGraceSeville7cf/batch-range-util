@@ -211,6 +211,8 @@ exit /b %ec_success%
     set "ter_step=1"
     set /a "ter_i=0"
 
+    if "%ter_range_expression%" == "?" set "ter_range_expression=?..?"
+
     call :skip_spaces ter_i "%ter_range_expression%"
     call :skip_number ter_i ter_first_number "%ter_range_expression%"
     set /a "ter_errorlevel=%errorlevel%"
