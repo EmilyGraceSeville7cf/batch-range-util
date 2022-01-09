@@ -16,6 +16,8 @@ set /a "i=0"
         goto copy_options
     )
 
+set /a "not_wine_used=%false%"
+
 set /a "i=0"
 :main_loop
     set /a "j=%i% + 1"
@@ -38,6 +40,14 @@ set /a "i=0"
     if not errorlevel 1 (
         call :interactive
         exit /b %ec_success%
+    )
+
+    call :is_option "%option%" -nw --not-wine
+    if not errorlevel 1 (
+        set /a "is_wine=%false%"
+        set /a "not_wine_used=%true%"
+        set /a "i+=1"
+        goto main_loop
     )
 
     call :is_option "%option%" -l --limit
@@ -76,6 +86,11 @@ set /a "i=0"
         exit /b %ec_unsupported_syntax%
     )
 
+    if "%not_wine_used%" == "%true%" (
+        echo Redundant -nw^|--not-wine option >&2
+        exit /b %ec_unsupported_syntax%
+    )
+
     call :try_expand_range range "%range%"
     if errorlevel 1 exit /b %ec_unsupported_syntax%
     echo %range%
@@ -88,13 +103,33 @@ set /a "i=0"
     set /a "true=0"
     set /a "false=1"
 
+    call :check_dependencies
+
     set "delimiter= "
     set "prompt=$ "
 
     set /a "default_range_limit=100"
     set /a "range_limit=%default_range_limit%"
 
-    call :check_dependencies
+    set /a "is_wine=%false%"
+	if defined WINEDEBUG (
+        set /a "is_wine=%true%"
+        exit /b %ec_success%
+    )
+
+    call :set_esc
+
+    set "default_color=%esc%[0m"
+
+    if not defined PROMPT_MARKER set "PROMPT_MARKER=%esc%[34m"
+    if not defined PROMPT_ERROR_CODE set "PROMPT_ERROR_CODE=%esc%[36m"
+
+    if not defined HELP_HEADER_MARKER set "HELP_HEADER_MARKER=%esc%[36m"
+    if not defined HELP_HEADER_ITEM set "HELP_HEADER_MARKER=%esc%[96m"
+    if not defined HELP_LIST_MARKER set "HELP_LIST_MARKER=%esc%[36m"
+    if not defined HELP_LIST_ITEM set "HELP_LIST_ITEM=%esc%[96m"
+    if not defined HELP_NOTE_MARKER set "HELP_NOTE_MARKER=%esc%[31m"
+    if not defined HELP_NOTE_ITEM set "HELP_NOTE_ITEM=%esc%[91m"
 exit /b %ec_success%
 
 :check_dependencies
@@ -108,35 +143,43 @@ exit /b %ec_success%
 exit /b %ec_success%
 
 :help
+    setlocal enabledelayedexpansion
     echo Tool to generate ranges and print them into stdout.
     echo.
-    echo [ Non-interactive mode ]
-    echo    range { -h --help } { -v --version } { { -l <number> ^| --limit <number> } , { -i --interactive } }
-	echo    range { { -l <number> ^| --limit <number> } , ^<from^>..^<to^>..[^<step^>] }
+    echo !HELP_HEADER_MARKER![!HELP_HEADER_ITEM! Non-interactive mode !HELP_HEADER_MARKER!]!default_color!
+    echo    range { -h --help } { -v --version } { { -l ^<number^> ^| --limit ^<number^> } , { -nw --not-wine } , { -i --interactive } }
+	echo    range { { -l ^<number^> ^| --limit ^<number^> } , ^<from^>..^<to^>..[^<step^>] }
     echo.
-    echo    * -h^|--help - print help
-    echo    * -v^|--version - print version
-    echo    * -i^|--interactive - start an interactive session
-    echo    * -l^|--limit - specify random number range limit (default: 100)
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -h^|--help - print help!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -v^|--version - print version!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -l^|--limit - specify random number range limit (default: 100)!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -nw^|--not-wine - treat environment as not Wine!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -i^|--interactive - start an interactive session!default_color!
 	echo.
-    echo    * 0 - Success
-    echo    * 2 - Missing value for -l^|--limit found
-    echo    * 2 - Unsupported option used
-    echo    * 2 - Missing range
-    echo    * 2 - Trailing argument after first range used
-    echo    * 2 - No previous command found
-    echo    * 2 - Negative step used
-    echo    * 2 - Wrong char used
-    echo    * 2 - Not enough characters used
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 0 - Success!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Missing value for -l^|--limit found!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Unsupported option used!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Missing range!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Trailing argument after first range used!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Redundant -nw^|--not-wine option!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - No previous command found!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Negative step used!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Wrong char used!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Not enough characters used!default_color!
     echo.
-    echo [ Interactive mode ]
-	echo    * h^|help - print help
-    echo    * v^|version - print version
-    echo    * q^|quit - exit
-    echo    * c^|clear - clears screen
-	echo    * !! - print help
+    echo !HELP_HEADER_MARKER![!HELP_HEADER_ITEM! Interactive mode !HELP_HEADER_MARKER!]!default_color!
+	echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! h^|help - print help!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! v^|version - print version!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! q^|quit - exit!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! c^|clear - clears screen!default_color!
+    echo.   | set /p "_=   !HELP_LIST_MARKER!*!HELP_LIST_ITEM! "
+    endlocal
+    echo.   | set /p "_=!! - print help"
+    setlocal enabledelayedexpansion
+	echo !default_color!
 	echo.
-	echo    ^> Interactive mode prompt is: ^<return_code^>^>^>^>.
+	echo    !HELP_NOTE_MARKER!^> !HELP_NOTE_ITEM!Interactive mode prompt is: ^<return_code^>^>^>^>.!default_color!
+    endlocal
 exit /b %ec_success%
 
 :version
@@ -462,4 +505,11 @@ exit /b %ec_success%
             set /a "ca_i+=1"
             goto ca_clear_arguments_loop
         )
+exit /b %ec_success%
+
+:set_esc
+    for /f "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1) do rem"') do (
+        set "esc=%%b"
+        exit /b 0
+    )
 exit /b %ec_success%
