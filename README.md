@@ -9,7 +9,7 @@ Tool to generate ranges and print them into stdout.
 ## Syntax
 
 ```bat
-range -h|-help -v|--version ( -l|--limit -i|--interactive )
+range -h|--help -v|--version ( -l|--limit -i|--interactive )
 range ( -l|--limit <from>..<to>..[<step>] )
 ```
 

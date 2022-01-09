@@ -135,6 +135,10 @@ set /a "i=0"
     if not defined HELP_LIST_ITEM set "HELP_LIST_ITEM=%esc%[96m"
     if not defined HELP_NOTE_MARKER set "HELP_NOTE_MARKER=%esc%[31m"
     if not defined HELP_NOTE_ITEM set "HELP_NOTE_ITEM=%esc%[91m"
+
+    if not defined SYNTAX_COMMAND_NAME set "SYNTAX_COMMAND_NAME=%esc%[32m"
+    if not defined SYNTAX_COMMAND_SWITCH_NAME set "SYNTAX_COMMAND_SWITCH_NAME=%esc%[924m"
+    if not defined SYNTAX_COMMAND_SWITCH_TYPE set "SYNTAX_COMMAND_SWITCH_TYPE=%esc%[93m"
 exit /b %ec_success%
 
 :help
@@ -142,8 +146,8 @@ exit /b %ec_success%
     echo Tool to generate ranges and print them into stdout.
     echo.
     echo !HELP_HEADER_MARKER![!HELP_HEADER_ITEM! Non-interactive mode !HELP_HEADER_MARKER!]!default_color!
-    echo     range -h^|-help -v^|--version ^( -l^|--limit -i^|--interactive ^)
-    echo     range ^( -l^|--limit ^<from^>..^<to^>..[^<step^>] ^)
+    echo     !SYNTAX_COMMAND_NAME!range !SYNTAX_COMMAND_SWITCH_NAME!-h!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--help -v!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--version !default_color!^( !SYNTAX_COMMAND_SWITCH_NAME!-l!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--limit!default_color!:!SYNTAX_COMMAND_SWITCH_TYPE!number !SYNTAX_COMMAND_SWITCH_NAME!-i!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--interactive !default_color!^)
+    echo     !SYNTAX_COMMAND_NAME!range !default_color!^( !SYNTAX_COMMAND_SWITCH_NAME!-l!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--limit!default_color!:!SYNTAX_COMMAND_SWITCH_TYPE!number !default_color!^<from^>..^<to^>..[^<step^>] ^)
     echo.
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -h^|--help - print help!default_color!
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -v^|--version - print version!default_color!
