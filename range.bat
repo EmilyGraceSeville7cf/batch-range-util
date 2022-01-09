@@ -2,101 +2,148 @@
 setlocal
 
 call :init
+if errorlevel 1 exit /b %ec_unsupported_syntax%
 
-:main_loop
+call :clear_arguments args
+
+set /a "i=0"
+:copy_options
     set "option=%~1"
-    set "value=%~2"
+    if defined option (
+        set "args[%i%]=%option%"
+        shift
+        set /a "i+=1"
+        goto copy_options
+    )
 
-    set /a "is_help=%false%"
-    if "%option%" == "-h" set /a "is_help=%true%"
-    if "%option%" == "--help" set /a "is_help=%true%"
+set /a "i=0"
+:main_loop
+    set /a "j=%i% + 1"
+    call set "option=%%args[%i%]%%"
+    call set "value=%%args[%j%]%%"
 
-    if "%is_help%" == "%true%" (
+    call :is_option "%option%" -h --help
+    if not errorlevel 1 (
         call :help
         exit /b %ec_success%
     )
 
-    set /a "is_version=%false%"
-    if "%option%" == "-v" set /a "is_version=%true%"
-    if "%option%" == "--version" set /a "is_version=%true%"
-
-    if "%is_version%" == "%true%" (
+    call :is_option "%option%" -v --version
+    if not errorlevel 1 (
         call :version
         exit /b %ec_success%
     )
 
-    set /a "is_interactive=%false%"
-    if "%option%" == "-i" set /a "is_interactive=%true%"
-    if "%option%" == "--interactive" set /a "is_interactive=%true%"
-
-    if "%is_interactive%" == "%true%" (
+    call :is_option "%option%" -i --interactive
+    if not errorlevel 1 (
         call :interactive
         exit /b %ec_success%
+    )
+
+    call :is_option "%option%" -l --limit
+    if not errorlevel 1 (
+        if not defined value (
+            echo Missing value for -l^|--limit found >&2
+            exit /b %ec_unsupported_syntax%
+        )
+        if "%value%" == "0" (
+            echo Zero limit used >&2
+            exit /b %ec_unsupported_syntax%
+        )
+
+        set /a "range_limit=%value%"
+
+        set /a "i+=2"
+        goto main_loop
+    )
+
+    call :is_match "%option%" "^--"
+    if not errorlevel 1 (
+        echo Unsupported option "%option%" used >&2
+        exit /b %ec_unsupported_syntax%
     )
 
     set "range=%option%"
     set "next_argument=%value%"
 
+    if not defined range (
+        echo Missing range >&2
+        exit /b %ec_success%
+    )
+
     if defined next_argument (
-        echo %em_too_many_arguments% >&2
-        exit /b %ec_too_many_arguments%
+        echo Trailing argument "%next_argument%" after first range used >&2
+        exit /b %ec_unsupported_syntax%
     )
 
     call :try_expand_range range "%range%"
-    set /a "temp_errorlevel=%errorlevel%"
-    if %temp_errorlevel% equ 0 echo %range%
-    exit /b %temp_errorlevel%
+    if errorlevel 1 exit /b %ec_unsupported_syntax%
+    echo %range%
+    exit /b %ec_success%
 
 :init
     set /a "ec_success=0"
-
-    set /a "ec_too_many_arguments=2"
-
-    set "em_too_many_arguments=Other options or ranges are not allowed after first range construction"
+    set /a "ec_unsupported_syntax=2"
 
     set /a "true=0"
     set /a "false=1"
 
     set "delimiter= "
-    set "prompt=>>> "
+    set "prompt=$ "
+
+    set /a "default_range_limit=100"
+    set /a "range_limit=%default_range_limit%"
+
+    call :check_dependencies
+exit /b %ec_success%
+
+:check_dependencies
+    set /a "ec_missing_dependency=2"
+
+    gawk --version 2> nul > nul
+    if errorlevel 1 (
+        echo Missing dependency "gawk" found >&2
+        exit /b %ec_missing_dependency%
+    )
 exit /b %ec_success%
 
 :help
     echo Tool to generate ranges and print them into stdout.
     echo.
     echo [ Non-interactive mode ]
-    echo    range [{ -h ^| --help }] [{ -v ^| --version }] { -i ^| --interactive}
-	echo    range ^<from^>..^<to^>..[^<step^>]
+    echo    range { -h --help } { -v --version } { { -l <number> ^| --limit <number> } , { -i --interactive } }
+	echo    range { { -l <number> ^| --limit <number> } , ^<from^>..^<to^>..[^<step^>] }
     echo.
     echo    * -h^|--help - print help
     echo    * -v^|--version - print version
     echo    * -i^|--interactive - start an interactive session
+    echo    * -l^|--limit - specify random number range limit (default: 100)
 	echo.
     echo    * 0 - Success
-    echo    * 2 - Other options or ranges are not allowed after first range construction
-    echo    * 2 - Positive step number expected
-    echo    * 2 - Unexpected char found instead of range operator (..)
-    echo    * 2 - Unexpected end of string found instead of range operator (..)
-    echo    * 2 - Unexpected char found instead of digit or number sign
-    echo    * 2 - Unexpected end of string found instead of digit or number sign
+    echo    * 2 - Missing value for -l^|--limit found
+    echo    * 2 - Unsupported option used
+    echo    * 2 - Missing range
+    echo    * 2 - Trailing argument after first range used
+    echo    * 2 - No previous command found
+    echo    * 2 - Negative step used
+    echo    * 2 - Wrong char used
+    echo    * 2 - Not enough characters used
     echo.
     echo [ Interactive mode ]
-	echo    h^|help - print help
-	echo    v^|version - print version
-    echo    q^|quit - exit
-    echo    c^|clear - clears screen
-	echo    !! - print help
+	echo    * h^|help - print help
+    echo    * v^|version - print version
+    echo    * q^|quit - exit
+    echo    * c^|clear - clears screen
+	echo    * !! - print help
 	echo.
 	echo    ^> Interactive mode prompt is: ^<return_code^>^>^>^>.
 exit /b %ec_success%
 
 :version
-    echo 1.2 ^(c^) 2022 year
+    echo 2.0 ^(c^) 2022 year
 exit /b %ec_success%
 
 :interactive
-    set "i_em_no_previous_command=No previous command available to perform history expansion"
-
     set /a "i_last_errorlevel=0"
     set "i_previous_command="
 
@@ -111,8 +158,8 @@ exit /b %ec_success%
         if "%i_command: =%" == "" goto i_interactive_loop
         
         set "i_comment_regex=^#.*$"
-        echo %i_command%| grep %i_comment_regex% 2> nul > nul
-		if %errorlevel% equ 0 goto i_interactive_loop
+        call :is_match "%i_command%" "%i_comment_regex%"
+		if not errorlevel 1 goto i_interactive_loop
 
         set "i_after_remove_exclamation_marks=%i_command:!!=%"
 
@@ -120,32 +167,29 @@ exit /b %ec_success%
             call set "i_command=%%i_command:!!=%i_previous_command%%%"
         ) else (
             if not "%i_command%" == "%i_after_remove_exclamation_marks%" (
-                echo %i_em_no_previous_command%
+                echo No previous command found
                 goto i_interactive_loop
             )
         )
 
-        set /a "i_is_quit=%false%"
-        if "%i_command%" == "q" set /a "i_is_quit=%true%"
-        if "%i_command%" == "quit" set /a "i_is_quit=%true%"
-
-        if "%i_is_quit%" == "%true%" exit /b %ec_success%
+        call :is_option "%i_command%" q quit
+        if not errorlevel 1 exit /b %ec_success%
     
-        set /a "i_is_clear=%false%"
-        if "%i_command%" == "c" set /a "i_is_clear=%true%"
-        if "%i_command%" == "clear" set /a "i_is_clear=%true%"
-
-        if "%i_is_clear%" == "%true%" (
+        call :is_option "%i_command%" c clear
+        if not errorlevel 1 (
             cls
             goto i_interactive_loop
         )
 
-        set /a "i_is_help=%false%"
-        if "%i_command%" == "h" set /a "i_is_help=%true%"
-        if "%i_command%" == "help" set /a "i_is_help=%true%"
-
-        if "%i_is_help%" == "%true%" (
+        call :is_option "%i_command%" h help
+        if not errorlevel 1 (
             call :help
+            goto i_interactive_loop
+        )
+
+        call :is_option "%i_command%" v version
+        if not errorlevel 1 (
+            call :version
             goto i_interactive_loop
         )
 
@@ -159,8 +203,6 @@ exit /b %ec_success%
 :try_expand_range
     set /a "ter_ec_positive_step_number_expected=2"
 
-    set "ter_em_positive_step_number_expected=Positive step number expected"
-
     set "ter_variable_name=%~1"
     set "ter_range_expression=%~2"
 
@@ -168,6 +210,8 @@ exit /b %ec_success%
     set "ter_second_number="
     set "ter_step=1"
     set /a "ter_i=0"
+
+    if "%ter_range_expression%" == "?" set "ter_range_expression=?..?"
 
     call :skip_spaces ter_i "%ter_range_expression%"
     call :skip_number ter_i ter_first_number "%ter_range_expression%"
@@ -214,7 +258,7 @@ exit /b %ec_success%
 
     :ter_step_evaluation
     if %ter_step% leq 0 (
-        echo %ter_em_positive_step_number_expected% >&2
+        echo Negative step "%ter_step%" used >&2
         exit /b %ter_ec_positive_step_number_expected%
     )
     if %ter_first_number% gtr %ter_second_number% set /a "ter_step=-%ter_step%"
@@ -263,9 +307,6 @@ exit /b %ec_success%
     set /a "sro_ec_unexpected_char=2"
     set /a "sro_ec_unexpected_end_of_string=2"
 
-    set "sro_em_unexpected_char=Unexpected char found instead of range operator (..)"
-    set "sro_em_unexpected_end_of_string=Unexpected end of string found instead of range operator (..)"
-
     set "sro_index_variable_name=%~1"
     set "sro_string=%~2"
 
@@ -282,16 +323,12 @@ exit /b %ec_success%
                     set /a "sro_i+=1"
                     goto sro_skip_range_operator_loop
                 ) else (
-                    setlocal enabledelayedexpansion
-                    echo !sro_em_unexpected_char!
-                    endlocal
+                    echo Wrong char "%sro_char%" used >&2
                     set "%sro_index_variable_name%=%sro_i%"
                     exit /b %sro_ec_unexpected_char%
                 )
             ) else (
-                setlocal enabledelayedexpansion
-                echo !sro_em_unexpected_end_of_string!
-                endlocal
+                echo Not enough characters used >&2
                 set "%sro_index_variable_name%=%sro_i%"
                 exit /b %sro_ec_unexpected_end_of_string%
             )
@@ -303,9 +340,6 @@ exit /b %ec_success%
 :skip_number
     set /a "sn_ec_unexpected_char=2"
     set /a "sn_ec_unexpected_end_of_string=2"
-
-    set "sn_em_unexpected_char=Unexpected char found instead of digit or number sign"
-    set "sn_em_unexpected_end_of_string=Unexpected end of string found instead of digit or number sign"
 
     set "sn_index_variable_name=%~1"
     set "sn_result_number_variable_name=%~2"
@@ -321,14 +355,18 @@ exit /b %ec_success%
 
     :sn_skip_number_digits_loop
         call set "sn_char=%%sn_string:~%sn_i%,1%%"
-        set "sn_digit_regex=[0-9]"
         if not "%sn_char%" == ""  (
-            echo %sn_char%| grep %sn_digit_regex% 2> nul > nul
+            call :is_match "%sn_char%" "[0-9]"
 			if errorlevel 1 (
-                if %sn_result_number_digit_count% equ 0 (
-                    set "%sn_index_variable_name%=%sn_i%"
-                    echo %sn_em_unexpected_char%
-                    exit /b %sn_ec_unexpected_char%
+                if "%sn_char%" == "?" (
+                    set /a "sn_result_number=%RANDOM% %% %range_limit%"
+                    set /a "sn_i+=1"
+                ) else (
+                    if %sn_result_number_digit_count% equ 0 (
+                        set "%sn_index_variable_name%=%sn_i%"
+                        echo Wrong char "%sn_char%" used >&2
+                        exit /b %sn_ec_unexpected_char%
+                    )
                 )
             ) else (
                 set /a "sn_i+=1"
@@ -339,7 +377,7 @@ exit /b %ec_success%
         ) else (
             if %sn_result_number_digit_count% equ 0 (
                 set "%sn_index_variable_name%=%sn_i%"
-                echo %sn_em_unexpected_end_of_string%
+                echo Not enough characters used >&2
                 exit /b %sn_ec_unexpected_end_of_string%
             )
         )
@@ -387,4 +425,41 @@ exit /b %ec_success%
 
     echo %ue_string%
     echo %ue_placeholder%^^
+exit /b %ec_success%
+
+:is_option
+    set /a "io_option_is_not_recognized=1"
+
+    set "io_option=%~1"
+    set "io_short_option=%~2"
+    set "io_long_option=%~3"
+
+    set /a "io_matches=%false%"
+    if "%io_option%" == "%io_short_option%" set /a "io_matches=%true%"
+    if "%io_option%" == "%io_long_option%" set /a "io_matches=%true%"
+
+    if "%io_matches%" == "%false%" exit /b %io_option_is_not_recognized%
+exit /b %ec_success%
+
+:is_match
+    set /a "im_match_failed=1"
+
+    set "im_input=%~1"
+    set "im_pattern=%~2"
+
+    gawk "BEGIN { exit ""%im_input%"" ~ /%im_pattern%/ }"
+    if not errorlevel 1 exit /b %im_match_failed%
+exit /b %ec_success%
+
+:clear_arguments
+    set "ca_array_name=%~1"
+
+    set /a "ca_i=0"
+    :ca_clear_arguments_loop
+        call set "ca_argument=%%%ca_array_name%[%ca_i%]%%"
+        if defined ca_argument (
+            set "%ca_array_name%[%ca_i%]="
+            set /a "ca_i+=1"
+            goto ca_clear_arguments_loop
+        )
 exit /b %ec_success%
