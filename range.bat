@@ -99,11 +99,16 @@ set /a "i=0"
 :init
     set /a "ec_success=0"
     set /a "ec_unsupported_syntax=2"
+    set /a "ec_missing_dependency=2"
 
     set /a "true=0"
     set /a "false=1"
 
-    call :check_dependencies
+    gawk --version 2> nul > nul
+    if errorlevel 1 (
+        echo Missing dependency "gawk" found >&2
+        exit /b %ec_missing_dependency%
+    )
 
     set "delimiter= "
     set "prompt=$ "
@@ -130,16 +135,6 @@ set /a "i=0"
     if not defined HELP_LIST_ITEM set "HELP_LIST_ITEM=%esc%[96m"
     if not defined HELP_NOTE_MARKER set "HELP_NOTE_MARKER=%esc%[31m"
     if not defined HELP_NOTE_ITEM set "HELP_NOTE_ITEM=%esc%[91m"
-exit /b %ec_success%
-
-:check_dependencies
-    set /a "ec_missing_dependency=2"
-
-    gawk --version 2> nul > nul
-    if errorlevel 1 (
-        echo Missing dependency "gawk" found >&2
-        exit /b %ec_missing_dependency%
-    )
 exit /b %ec_success%
 
 :help
