@@ -2,10 +2,25 @@
 setlocal
 
 call :init
+if errorlevel 1 exit /b %ec_unsupported_syntax%
 
-:main_loop
+call :clear_arguments args
+
+set /a "i=0"
+:copy_options
     set "option=%~1"
-    set "value=%~2"
+    if defined option (
+        set "args[%i%]=%option%"
+        shift
+        set /a "i+=1"
+        goto copy_options
+    )
+
+set /a "i=0"
+:main_loop
+    set /a "j=%i% + 1"
+    call set "option=%%args[%i%]%%"
+    call set "value=%%args[%j%]%%"
 
     call :is_option "%option%" -h --help
     if not errorlevel 1 (
@@ -25,6 +40,23 @@ call :init
         exit /b %ec_success%
     )
 
+    call :is_option "%option%" -l --limit
+    if not errorlevel 1 (
+        if not defined value (
+            echo Missing value for -l^|--limit found >&2
+            exit /b %ec_unsupported_syntax%
+        )
+        if "%value%" == "0" (
+            echo Zero limit used >&2
+            exit /b %ec_unsupported_syntax%
+        )
+
+        set /a "range_limit=%value%"
+
+        set /a "i+=2"
+        goto main_loop
+    )
+
     call :is_match "%option%" "^--"
     if not errorlevel 1 (
         echo Unsupported option "%option%" used >&2
@@ -33,6 +65,11 @@ call :init
 
     set "range=%option%"
     set "next_argument=%value%"
+
+    if not defined range (
+        echo Missing range >&2
+        exit /b %ec_success%
+    )
 
     if defined next_argument (
         echo Trailing argument "%next_argument%" after first range used >&2
@@ -54,6 +91,9 @@ call :init
     set "delimiter= "
     set "prompt=$ "
 
+    set /a "default_range_limit=100"
+    set /a "range_limit=%default_range_limit%"
+
     call :check_dependencies
 exit /b %ec_success%
 
@@ -71,15 +111,18 @@ exit /b %ec_success%
     echo Tool to generate ranges and print them into stdout.
     echo.
     echo [ Non-interactive mode ]
-    echo    range { -h ^| --help } { -v ^| --version } { -i ^| --interactive }
-	echo    range ^<from^>..^<to^>..[^<step^>]
+    echo    range { -h --help } { -v --version } { { -l <number> ^| --limit <number> } , { -i --interactive } }
+	echo    range { { -l <number> ^| --limit <number> } , ^<from^>..^<to^>..[^<step^>] }
     echo.
     echo    * -h^|--help - print help
     echo    * -v^|--version - print version
     echo    * -i^|--interactive - start an interactive session
+    echo    * -l^|--limit - specify random number range limit (default: 100)
 	echo.
     echo    * 0 - Success
+    echo    * 2 - Missing value for -l^|--limit found
     echo    * 2 - Unsupported option used
+    echo    * 2 - Missing range
     echo    * 2 - Trailing argument after first range used
     echo    * 2 - No previous command found
     echo    * 2 - Negative step used
@@ -310,14 +353,18 @@ exit /b %ec_success%
 
     :sn_skip_number_digits_loop
         call set "sn_char=%%sn_string:~%sn_i%,1%%"
-        set "sn_digit_regex=[0-9]"
         if not "%sn_char%" == ""  (
-            call :is_match "%sn_char%" "%sn_digit_regex%"
+            call :is_match "%sn_char%" "[0-9]"
 			if errorlevel 1 (
-                if %sn_result_number_digit_count% equ 0 (
-                    set "%sn_index_variable_name%=%sn_i%"
-                    echo Wrong char "%sn_char%" used >&2
-                    exit /b %sn_ec_unexpected_char%
+                if "%sn_char%" == "?" (
+                    set /a "sn_result_number=%RANDOM% %% %range_limit%"
+                    set /a "sn_i+=1"
+                ) else (
+                    if %sn_result_number_digit_count% equ 0 (
+                        set "%sn_index_variable_name%=%sn_i%"
+                        echo Wrong char "%sn_char%" used >&2
+                        exit /b %sn_ec_unexpected_char%
+                    )
                 )
             ) else (
                 set /a "sn_i+=1"
@@ -400,4 +447,17 @@ exit /b %ec_success%
 
     gawk "BEGIN { exit ""%im_input%"" ~ /%im_pattern%/ }"
     if not errorlevel 1 exit /b %im_match_failed%
+exit /b %ec_success%
+
+:clear_arguments
+    set "ca_array_name=%~1"
+
+    set /a "ca_i=0"
+    :ca_clear_arguments_loop
+        call set "ca_argument=%%%ca_array_name%[%ca_i%]%%"
+        if defined ca_argument (
+            set "%ca_array_name%[%ca_i%]="
+            set /a "ca_i+=1"
+            goto ca_clear_arguments_loop
+        )
 exit /b %ec_success%
