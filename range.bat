@@ -171,7 +171,7 @@ exit /b %ec_success%
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! v^|version - print version!default_color!
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! q^|quit - exit!default_color!
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! c^|clear - clears screen!default_color!
-    awk "BEGIN { print \"   \" }"
+    awk "BEGIN { printf \"   \" }"
     echo.   | set /p "_=!HELP_LIST_MARKER!*!HELP_LIST_ITEM! "
     endlocal
     echo.   | set /p "_=!! - print help"
