@@ -193,7 +193,7 @@ exit /b %ec_success%
     :i_interactive_loop
         set "i_command="
         
-        if "%is_wine%" == "%true%" (
+        if "%is_wine%" == "%false%" (
             set /p "i_command=%PROMPT_ERROR_CODE%%i_last_errorlevel% %PROMPT_MARKER%%prompt%%default_color%"
         ) else (
             set /p "i_command=%i_last_errorlevel% %prompt%"
