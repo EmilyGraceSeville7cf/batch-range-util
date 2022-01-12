@@ -91,6 +91,8 @@ set /a "i=0"
         exit /b %ec_unsupported_syntax%
     )
 
+    if "%is_wine%" == "%false%" call :init_colors
+
     call :try_expand_range range "%range%"
     if errorlevel 1 exit /b %ec_unsupported_syntax%
     echo %range%
@@ -121,7 +123,9 @@ set /a "i=0"
         set /a "is_wine=%true%"
         exit /b %ec_success%
     )
+exit /b %ec_success%
 
+:init_colors
     call :set_esc
 
     set "default_color=%esc%[0m"
