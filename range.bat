@@ -130,7 +130,7 @@ set /a "i=0"
     if not defined PROMPT_ERROR_CODE set "PROMPT_ERROR_CODE=%esc%[36m"
 
     if not defined HELP_HEADER_MARKER set "HELP_HEADER_MARKER=%esc%[36m"
-    if not defined HELP_HEADER_ITEM set "HELP_HEADER_MARKER=%esc%[96m"
+    if not defined HELP_HEADER_ITEM set "HELP_HEADER_ITEM=%esc%[96m"
     if not defined HELP_LIST_MARKER set "HELP_LIST_MARKER=%esc%[36m"
     if not defined HELP_LIST_ITEM set "HELP_LIST_ITEM=%esc%[96m"
     if not defined HELP_NOTE_MARKER set "HELP_NOTE_MARKER=%esc%[31m"
