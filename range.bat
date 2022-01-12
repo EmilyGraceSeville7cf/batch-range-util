@@ -47,6 +47,7 @@ set /a "i=0"
         set /a "is_wine=%false%"
         set /a "not_wine_used=%true%"
         set /a "i+=1"
+        call :init_colors
         goto main_loop
     )
 
@@ -91,8 +92,6 @@ set /a "i=0"
         exit /b %ec_unsupported_syntax%
     )
 
-    if "%is_wine%" == "%false%" call :init_colors
-
     call :try_expand_range range "%range%"
     if errorlevel 1 exit /b %ec_unsupported_syntax%
     echo %range%
@@ -119,10 +118,7 @@ set /a "i=0"
     set /a "range_limit=%default_range_limit%"
 
     set /a "is_wine=%false%"
-	if defined WINEDEBUG (
-        set /a "is_wine=%true%"
-        exit /b %ec_success%
-    )
+	if defined WINEDEBUG set /a "is_wine=%true%"
 exit /b %ec_success%
 
 :init_colors
