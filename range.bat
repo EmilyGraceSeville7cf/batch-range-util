@@ -175,7 +175,7 @@ exit /b %ec_success%
     endlocal
     echo.   | set /p "_=!! - print help"
     setlocal enabledelayedexpansion
-	echo !default_color!
+	echo. !default_color!
 	echo.
 	echo    !HELP_NOTE_MARKER!^> !HELP_NOTE_ITEM!Interactive mode prompt is: ^<return_code^>^>^>^>.!default_color!
     endlocal
