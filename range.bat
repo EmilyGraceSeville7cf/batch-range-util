@@ -174,7 +174,7 @@ exit /b %ec_success%
     awk "BEGIN { printf \"   \" }"
     echo.   | set /p "_=!HELP_LIST_MARKER!*!HELP_LIST_ITEM! "
     endlocal
-    echo.   | set /p "_=!! - print help"
+    echo.   | set /p "_=!! - Insert previous command"
     setlocal enabledelayedexpansion
 	echo. !default_color!
 	echo.
