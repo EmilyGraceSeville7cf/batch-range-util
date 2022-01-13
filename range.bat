@@ -149,11 +149,11 @@ exit /b %ec_success%
     echo     !SYNTAX_COMMAND_NAME!range !SYNTAX_COMMAND_SWITCH_NAME!-h!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--help -v!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--version !default_color!^( !SYNTAX_COMMAND_SWITCH_NAME!-l!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--limit!default_color!:!SYNTAX_COMMAND_SWITCH_TYPE!number !SYNTAX_COMMAND_SWITCH_NAME!-i!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--interactive !default_color!^)
     echo     !SYNTAX_COMMAND_NAME!range !default_color!^( !SYNTAX_COMMAND_SWITCH_NAME!-l!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--limit!default_color!:!SYNTAX_COMMAND_SWITCH_TYPE!number !default_color!^<from^>..^<to^>..[^<step^>] ^)
     echo.
-    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -h^|--help - print help!default_color!
-    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -v^|--version - print version!default_color!
-    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -l^|--limit - specify random number range limit (default: 100)!default_color!
-    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -nw^|--not-wine - treat environment as not Wine!default_color!
-    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -i^|--interactive - start an interactive session!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -h^|--help - Print help!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -v^|--version - Print version!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -l^|--limit - Specify random number range limit (default: 100)!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -nw^|--not-wine - Treat environment as not Wine!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -i^|--interactive - Start an interactive session!default_color!
 	echo.
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 0 - Success!default_color!
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Missing value for -l^|--limit found!default_color!
@@ -170,7 +170,7 @@ exit /b %ec_success%
 	echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! h^|help - Print help!default_color!
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! v^|version - Print version!default_color!
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! q^|quit - Exit!default_color!
-    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! c^|clear - Clears screen!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! c^|clear - Clear screen!default_color!
     awk "BEGIN { printf \"   \" }"
     echo.   | set /p "_=!HELP_LIST_MARKER!*!HELP_LIST_ITEM! "
     endlocal
