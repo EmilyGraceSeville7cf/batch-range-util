@@ -16,6 +16,8 @@ set /a "i=0"
         goto copy_options
     )
 
+set /a "not_wine_used=%false%"
+
 set /a "i=0"
 :main_loop
     set /a "j=%i% + 1"
@@ -38,6 +40,15 @@ set /a "i=0"
     if not errorlevel 1 (
         call :interactive
         exit /b %ec_success%
+    )
+
+    call :is_option "%option%" -nw --not-wine
+    if not errorlevel 1 (
+        set /a "is_wine=%false%"
+        set /a "not_wine_used=%true%"
+        set /a "i+=1"
+        call :init_colors
+        goto main_loop
     )
 
     call :is_option "%option%" -l --limit
@@ -76,6 +87,11 @@ set /a "i=0"
         exit /b %ec_unsupported_syntax%
     )
 
+    if "%not_wine_used%" == "%true%" (
+        echo Redundant -nw^|--not-wine option >&2
+        exit /b %ec_unsupported_syntax%
+    )
+
     call :try_expand_range range "%range%"
     if errorlevel 1 exit /b %ec_unsupported_syntax%
     echo %range%
@@ -84,9 +100,16 @@ set /a "i=0"
 :init
     set /a "ec_success=0"
     set /a "ec_unsupported_syntax=2"
+    set /a "ec_missing_dependency=2"
 
     set /a "true=0"
     set /a "false=1"
+
+    gawk --version 2> nul > nul
+    if errorlevel 1 (
+        echo Missing dependency "gawk" found >&2
+        exit /b %ec_missing_dependency%
+    )
 
     set "delimiter= "
     set "prompt=$ "
@@ -94,49 +117,69 @@ set /a "i=0"
     set /a "default_range_limit=100"
     set /a "range_limit=%default_range_limit%"
 
-    call :check_dependencies
+    set /a "is_wine=%false%"
+	if defined WINEDEBUG set /a "is_wine=%true%"
 exit /b %ec_success%
 
-:check_dependencies
-    set /a "ec_missing_dependency=2"
+:init_colors
+    call :set_esc
 
-    gawk --version 2> nul > nul
-    if errorlevel 1 (
-        echo Missing dependency "gawk" found >&2
-        exit /b %ec_missing_dependency%
-    )
+    set "default_color=%esc%[0m"
+
+    if not defined PROMPT_MARKER set "PROMPT_MARKER=%esc%[34m"
+    if not defined PROMPT_ERROR_CODE set "PROMPT_ERROR_CODE=%esc%[36m"
+
+    if not defined HELP_HEADER_MARKER set "HELP_HEADER_MARKER=%esc%[36m"
+    if not defined HELP_HEADER_ITEM set "HELP_HEADER_ITEM=%esc%[4;96m"
+    if not defined HELP_LIST_MARKER set "HELP_LIST_MARKER=%esc%[36m"
+    if not defined HELP_LIST_ITEM set "HELP_LIST_ITEM=%esc%[96m"
+    if not defined HELP_NOTE_MARKER set "HELP_NOTE_MARKER=%esc%[31m"
+    if not defined HELP_NOTE_ITEM set "HELP_NOTE_ITEM=%esc%[91m"
+
+    if not defined SYNTAX_COMMAND_NAME set "SYNTAX_COMMAND_NAME=%esc%[32m"
+    if not defined SYNTAX_COMMAND_SWITCH_NAME set "SYNTAX_COMMAND_SWITCH_NAME=%esc%[92m"
+    if not defined SYNTAX_COMMAND_SWITCH_TYPE set "SYNTAX_COMMAND_SWITCH_TYPE=%esc%[93m"
 exit /b %ec_success%
 
 :help
+    setlocal enabledelayedexpansion
     echo Tool to generate ranges and print them into stdout.
     echo.
-    echo [ Non-interactive mode ]
-    echo    range { -h --help } { -v --version } { { -l <number> ^| --limit <number> } , { -i --interactive } }
-	echo    range { { -l <number> ^| --limit <number> } , ^<from^>..^<to^>..[^<step^>] }
+    echo !HELP_HEADER_MARKER![ !HELP_HEADER_ITEM!Non-interactive mode!default_color! !HELP_HEADER_MARKER!]!default_color!
+    echo     !SYNTAX_COMMAND_NAME!range !SYNTAX_COMMAND_SWITCH_NAME!-h!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--help -v!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--version !default_color!^( !SYNTAX_COMMAND_SWITCH_NAME!-l!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--limit!default_color!:!SYNTAX_COMMAND_SWITCH_TYPE!number !SYNTAX_COMMAND_SWITCH_NAME!-i!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--interactive !default_color!^)
+    echo     !SYNTAX_COMMAND_NAME!range !default_color!^( !SYNTAX_COMMAND_SWITCH_NAME!-l!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--limit!default_color!:!SYNTAX_COMMAND_SWITCH_TYPE!number !default_color!^<from^>..^<to^>..[^<step^>] ^)
     echo.
-    echo    * -h^|--help - print help
-    echo    * -v^|--version - print version
-    echo    * -i^|--interactive - start an interactive session
-    echo    * -l^|--limit - specify random number range limit (default: 100)
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -h^|--help - print help!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -v^|--version - print version!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -l^|--limit - specify random number range limit (default: 100)!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -nw^|--not-wine - treat environment as not Wine!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -i^|--interactive - start an interactive session!default_color!
 	echo.
-    echo    * 0 - Success
-    echo    * 2 - Missing value for -l^|--limit found
-    echo    * 2 - Unsupported option used
-    echo    * 2 - Missing range
-    echo    * 2 - Trailing argument after first range used
-    echo    * 2 - No previous command found
-    echo    * 2 - Negative step used
-    echo    * 2 - Wrong char used
-    echo    * 2 - Not enough characters used
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 0 - Success!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Missing value for -l^|--limit found!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Unsupported option used!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Missing range!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Trailing argument after first range used!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Redundant -nw^|--not-wine option!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - No previous command found!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Negative step used!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Wrong char used!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Not enough characters used!default_color!
     echo.
-    echo [ Interactive mode ]
-	echo    * h^|help - print help
-    echo    * v^|version - print version
-    echo    * q^|quit - exit
-    echo    * c^|clear - clears screen
-	echo    * !! - print help
+    echo !HELP_HEADER_MARKER![ !HELP_HEADER_ITEM!Interactive mode!default_color! !HELP_HEADER_MARKER!]!default_color!
+	echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! h^|help - Print help!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! v^|version - Print version!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! q^|quit - Exit!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! c^|clear - Clears screen!default_color!
+    awk "BEGIN { printf \"   \" }"
+    echo.   | set /p "_=!HELP_LIST_MARKER!*!HELP_LIST_ITEM! "
+    endlocal
+    echo.   | set /p "_=!! - Insert previous command"
+    setlocal enabledelayedexpansion
+	echo. !default_color!
 	echo.
-	echo    ^> Interactive mode prompt is: ^<return_code^>^>^>^>.
+	echo    !HELP_NOTE_MARKER!^> !HELP_NOTE_ITEM!Interactive mode prompt is: ^<return_code^>^>^>^>.!default_color!
+    endlocal
 exit /b %ec_success%
 
 :version
@@ -149,7 +192,12 @@ exit /b %ec_success%
 
     :i_interactive_loop
         set "i_command="
-        set /p "i_command=%i_last_errorlevel% %prompt%"
+        
+        if "%is_wine%" == "%false%" (
+            set /p "i_command=%PROMPT_ERROR_CODE%%i_last_errorlevel% %PROMPT_MARKER%%prompt%%default_color%"
+        ) else (
+            set /p "i_command=%i_last_errorlevel% %prompt%"
+        )
 
         if not defined i_command goto i_interactive_loop
 
@@ -447,7 +495,7 @@ exit /b %ec_success%
     set "im_input=%~1"
     set "im_pattern=%~2"
 
-    gawk "BEGIN { exit ""%im_input%"" ~ /%im_pattern%/ }"
+    gawk "BEGIN { exit \"%im_input%\" ~ /%im_pattern%/ }"
     if not errorlevel 1 exit /b %im_match_failed%
 exit /b %ec_success%
 
@@ -462,4 +510,11 @@ exit /b %ec_success%
             set /a "ca_i+=1"
             goto ca_clear_arguments_loop
         )
+exit /b %ec_success%
+
+:set_esc
+    for /f "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1) do rem"') do (
+        set "esc=%%b"
+        exit /b 0
+    )
 exit /b %ec_success%
