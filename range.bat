@@ -495,7 +495,7 @@ exit /b %ec_success%
     set "im_input=%~1"
     set "im_pattern=%~2"
 
-    gawk "BEGIN { exit "\%im_input%\" ~ /%im_pattern%/ }"
+    gawk "BEGIN { exit \"%im_input%\" ~ /%im_pattern%/ }"
     if not errorlevel 1 exit /b %im_match_failed%
 exit /b %ec_success%
 
