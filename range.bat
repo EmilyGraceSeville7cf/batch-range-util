@@ -130,7 +130,7 @@ exit /b %ec_success%
     if not defined PROMPT_ERROR_CODE set "PROMPT_ERROR_CODE=%esc%[36m"
 
     if not defined HELP_HEADER_MARKER set "HELP_HEADER_MARKER=%esc%[36m"
-    if not defined HELP_HEADER_ITEM set "HELP_HEADER_ITEM=%esc%[96m"
+    if not defined HELP_HEADER_ITEM set "HELP_HEADER_ITEM=%esc%[4;96m"
     if not defined HELP_LIST_MARKER set "HELP_LIST_MARKER=%esc%[36m"
     if not defined HELP_LIST_ITEM set "HELP_LIST_ITEM=%esc%[96m"
     if not defined HELP_NOTE_MARKER set "HELP_NOTE_MARKER=%esc%[31m"
@@ -167,10 +167,10 @@ exit /b %ec_success%
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! 2 - Not enough characters used!default_color!
     echo.
     echo !HELP_HEADER_MARKER![!HELP_HEADER_ITEM! Interactive mode !HELP_HEADER_MARKER!]!default_color!
-	echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! h^|help - print help!default_color!
-    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! v^|version - print version!default_color!
-    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! q^|quit - exit!default_color!
-    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! c^|clear - clears screen!default_color!
+	echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! h^|help - Print help!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! v^|version - Print version!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! q^|quit - Exit!default_color!
+    echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! c^|clear - Clears screen!default_color!
     awk "BEGIN { printf \"   \" }"
     echo.   | set /p "_=!HELP_LIST_MARKER!*!HELP_LIST_ITEM! "
     endlocal
