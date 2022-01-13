@@ -146,7 +146,7 @@ exit /b %ec_success%
     echo Tool to generate ranges and print them into stdout.
     echo.
     echo !HELP_HEADER_MARKER![ !HELP_HEADER_ITEM!Non-interactive mode!default_color! !HELP_HEADER_MARKER!]!default_color!
-    echo     !SYNTAX_COMMAND_NAME!range !SYNTAX_COMMAND_SWITCH_NAME!-h!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--help -v!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--version !default_color!^( -nw!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--not-wine !SYNTAX_COMMAND_SWITCH_NAME!-l!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--limit!default_color!:!SYNTAX_COMMAND_SWITCH_TYPE!number !SYNTAX_COMMAND_SWITCH_NAME!-i!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--interactive !default_color!^)
+    echo     !SYNTAX_COMMAND_NAME!range !SYNTAX_COMMAND_SWITCH_NAME!-h!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--help -v!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--version !default_color!^( !SYNTAX_COMMAND_SWITCH_NAME!-nw!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--not-wine !SYNTAX_COMMAND_SWITCH_NAME!-l!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--limit!default_color!:!SYNTAX_COMMAND_SWITCH_TYPE!number !SYNTAX_COMMAND_SWITCH_NAME!-i!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--interactive !default_color!^)
     echo     !SYNTAX_COMMAND_NAME!range !default_color!^( !SYNTAX_COMMAND_SWITCH_NAME!-l!default_color!^|!SYNTAX_COMMAND_SWITCH_NAME!--limit!default_color!:!SYNTAX_COMMAND_SWITCH_TYPE!number !default_color!^<from^>..^<to^>..[^<step^>] ^)
     echo.
     echo    !HELP_LIST_MARKER!*!HELP_LIST_ITEM! -h^|--help - Print help!default_color!
