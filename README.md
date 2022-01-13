@@ -9,8 +9,8 @@ Tool to generate ranges and print them into stdout.
 ## Syntax
 
 ```bat
-range -h|--help -v|--version ( -l|--limit -i|--interactive )
-range ( -l|--limit <from>..<to>..[<step>] )
+range -h|--help -v|--version ( -nw|--not-wine -l|--limit:number -i|--interactive )
+range ( -l|--limit:number <from>..<to>..[<step>] )
 ```
 
 | Short option |   Long option   | Default | Description                       |
