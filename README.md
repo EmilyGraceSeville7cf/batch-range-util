@@ -26,10 +26,11 @@ range ( -l|--limit <from>..<to>..[<step>] )
 | Return code | Description                              |
 | :---------: | :--------------------------------------- |
 |     `0`     | Success                                  |
-|     `2`     | Missing value for -l&#124;--limit found |
+|     `2`     | Missing value for -l&#124;--limit found  |
 |     `2`     | Unsupported option used                  |
 |     `2`     | Missing range                            |
 |     `2`     | Trailing argument after first range used |
+|     `2`     | Redundant -nw&#124;--not-wine option     |
 |     `2`     | No previous command found                |
 |     `2`     | Negative step used                       |
 |     `2`     | Wrong char used                          |
