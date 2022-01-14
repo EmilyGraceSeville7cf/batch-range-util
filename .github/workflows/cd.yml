@@ -11,3 +11,4 @@ jobs:
       publish: true
       versioning: other
       tag: v2.1
+      pattern: range.bat
